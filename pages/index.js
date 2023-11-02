@@ -170,12 +170,12 @@ export default function Home() {
             <button
               key={res.id}
               onClick={() => handleButtonClick(res.id)}
-              className='p-4 rounded-md bg-gray-300 dark:bg-gray-600 hover:bg-gray-100 dark:hover:bg-gray-500 text-black dark:text-white'
+              className='p-4 rounded-md bg-gray-300 dark:bg-gray-600 hover:bg-gray-100 dark:hover:bg-gray-500 shadow-md hover:shadow-xl text-black dark:text-white'
             >
-              <h1 className='mb-3 font-bold'>{res.id}</h1>
+              <h1 className='mb-3 font-bold text-left'>{res.id}</h1>
               <h1 className='flex justify-between font-uthmanic-hafs'>
                 {res.title}
-                <p className='font-bold'>{res.arabic}</p>
+                <p className='font-bold text-xl'>{res.arabic}</p>
               </h1>
             </button>
           );
