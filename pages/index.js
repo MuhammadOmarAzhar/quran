@@ -173,7 +173,7 @@ export default function Home() {
               className='p-4 rounded-md bg-gray-300 dark:bg-gray-600 hover:bg-gray-100 dark:hover:bg-gray-500 text-black dark:text-white'
             >
               <h1 className='mb-3 font-bold'>{res.id}</h1>
-              <h1 className='flex justify-between'>
+              <h1 className='flex justify-between font-uthmanic-hafs'>
                 {res.title}
                 <p className='font-bold'>{res.arabic}</p>
               </h1>

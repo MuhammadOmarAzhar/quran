@@ -3,7 +3,7 @@ import axios from 'axios';
 import {useEffect, useState} from 'react';
 
 const Ayahs = () => {
-  const [ayah, setAyah] = useState('');
+  const [ayah, setAyah] = useState([]);
   const [translation, setTranslation] = useState('');
   const [surah, setSurah] = useState();
   const [ayahNum, setAyahNum] = useState();
@@ -18,13 +18,20 @@ const Ayahs = () => {
 
   const getAyahs = async (id) => {
     try {
-      const juz = await axios.get(
-        `http://api.alquran.cloud/v1/juz/${id}/en.asad`
-      );
+      const [englishData, ArabicData] = await Promise.all([
+        axios.get(`http://api.alquran.cloud/v1/juz/${id}/en.asad`),
+        axios.get(`http://api.alquran.cloud/v1/juz/${id}/quran-uthmani`),
+      ]);
+
       debugger;
-      const ayahs = juz.data.ayahs;
-      const text = ayahs.text;
-      return text;
+
+      const ayahs = ArabicData.data.data.ayahs;
+      const translation = englishData.data.data.ayahs;
+      const ayahnum = ayahs.number;
+      setTranslation(translation);
+      setAyah(ayahs);
+      debugger;
+      setAyahNum(ayahnum);
     } catch (error) {
       console.log(error.message);
     }
@@ -32,15 +39,36 @@ const Ayahs = () => {
 
   const fetchJuz = async (id) => {
     try {
-      debugger;
-      let res = await getAyahs(id);
-      setAyah(res);
+      await getAyahs(id);
     } catch (error) {
       console.log(error.message);
     }
   };
 
-  return <div className='bg-white dark:bg-slate-800 text-black'>id:{id}</div>;
+  return (
+    <div className='bg-white dark:bg-slate-800 text-black p-10 grid grid-cols-1'>
+      {ayah.map((res, index) => {
+        return (
+          <div
+            key={res.number}
+            className='text-black dark:text-white p-4 m-3 border rounded-md'
+          >
+            <h1>
+              {translation[index].surah.number}:
+              {translation[index].numberInSurah}
+            </h1>
+            <h1 className='font-bold text-2xl text-right font-uthmanic-hafs'>
+              {res.text}
+            </h1>
+            <h1 className='font-semibold'>
+              Translation: <br />
+            </h1>
+            <p>{translation[index].text}</p>
+          </div>
+        );
+      })}
+    </div>
+  );
 };
 
 export default Ayahs;
