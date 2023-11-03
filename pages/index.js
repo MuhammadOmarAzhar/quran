@@ -1,4 +1,5 @@
 import {useRouter} from 'next/router';
+import App from './components/navbar';
 
 export default function Home() {
   const router = useRouter();
@@ -164,6 +165,9 @@ export default function Home() {
 
   return (
     <div className='h-full bg-white dark:bg-slate-800 p-10'>
+      <div className='flex items-center mb-5'>
+        <App />
+      </div>
       <div className='grid grid-cols-4 gap-5'>
         {juz.map((res) => {
           return (
