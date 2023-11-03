@@ -1,8 +1,48 @@
 import {useRouter} from 'next/router';
-import App from './components/navbar';
+import NavBar from './components/navbar';
+import {Juz} from './constants';
+import {useEffect, useState} from 'react';
+import axios from 'axios';
+import {first} from 'lodash';
 
 export default function Home() {
   const router = useRouter();
+  const [options, setOptions] = useState([]);
+  const [surahList, setSurahList] = useState([]);
+
+  const getSurahs = async () => {
+    try {
+      const response = await axios.get('http://api.alquran.cloud/v1/surah');
+      const {data: responseData} = response.data;
+      setSurahList(responseData);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const handleSearch = (value) => {
+    const filteredOptions = surahList
+      .filter((item) =>
+        item.englishName.toLowerCase().includes(value.toLowerCase())
+      )
+      .map((item) => {
+        return {
+          number: item.number,
+          value: item.englishName,
+          label: `${item.englishName} (Surah ${item.number})`,
+        };
+      });
+
+    setOptions(filteredOptions);
+  };
+
+  const onSelect = (value) => {
+    const surah = first(options.filter((res) => res.value == value));
+    router.push({
+      pathname: '/surahs',
+      query: {surahNumber: surah.number, surahName: surah.label},
+    });
+  };
 
   const handleButtonClick = (id) => {
     router.push({
@@ -10,166 +50,22 @@ export default function Home() {
       query: {id},
     });
   };
-  const juz = [
-    {
-      id: 1,
-      title: 'Alif Lam Meem',
-      arabic: 'آلم',
-    },
-    {
-      id: 2,
-      title: 'Sayaqūl',
-      arabic: 'سيقول السفهاء',
-    },
-    {
-      id: 3,
-      title: 'Tilka -r-rusul',
-      arabic: 'تلك الرسل',
-    },
-    {
-      id: 4,
-      title: 'Lan Tana Lu',
-      arabic: 'لن تنالوا',
-    },
-    {
-      id: 5,
-      title: 'W-al-muḥṣanāt',
-      arabic: 'والمحصنات',
-    },
-    {
-      id: 6,
-      title: 'Lā yuẖibbu-llāh',
-      arabic: 'لا يحب الله',
-    },
-    {
-      id: 7,
-      title: 'Wa idha sami ū',
-      arabic: 'وإذا سمعوا',
-    },
-    {
-      id: 8,
-      title: 'Wa law annanā',
-      arabic: 'ولو أننا',
-    },
-    {
-      id: 9,
-      title: 'Qāl al-malā',
-      arabic: 'قال الملأ',
-    },
-    {
-      id: 10,
-      title: 'W-aʿlamū',
-      arabic: 'واعلموا',
-    },
-    {
-      id: 11,
-      title: 'Ya tadhirūna',
-      arabic: 'يعتذرون',
-    },
-    {
-      id: 12,
-      title: 'Wa mā min dābbah',
-      arabic: 'ومامن دابة',
-    },
-    {
-      id: 13,
-      title: 'Wa mā ubarri u',
-      arabic: 'وما أبرئ',
-    },
-    {
-      id: 14,
-      title: 'Ruba Ma',
-      arabic: 'ربما',
-    },
-    {
-      id: 15,
-      title: 'Subḥāna -lladhi',
-      arabic: 'سبحٰن الذیٓ',
-    },
-    {
-      id: 16,
-      title: 'Qāla a-lam',
-      arabic: 'قال ألم',
-    },
-    {
-      id: 17,
-      title: 'Iqtaraba li-n-nās',
-      arabic: 'اقترب للناس',
-    },
-    {
-      id: 18,
-      title: 'Qad aflaḥa',
-      arabic: 'قد أفلح',
-    },
-    {
-      id: 19,
-      title: 'Wa-qāla -lladhīna',
-      arabic: 'وقال الذين',
-    },
-    {
-      id: 20,
-      title: 'Amman khalaqa',
-      arabic: 'امن خلق',
-    },
-    {
-      id: 21,
-      title: 'Otlu maa oohiya',
-      arabic: 'اتل مآ اوحی',
-    },
-    {
-      id: 22,
-      title: 'Wa-man yaqnut',
-      arabic: 'ومن يقنت',
-    },
-    {
-      id: 23,
-      title: 'Wama liya',
-      arabic: 'ومالی',
-    },
-    {
-      id: 24,
-      title: 'Fa-man aẓlamu',
-      arabic: 'فمن أظلم',
-    },
-    {
-      id: 25,
-      title: 'Ilaihi yuraddu',
-      arabic: 'إليه يرد',
-    },
-    {
-      id: 26,
-      title: 'Ḥāʾ Mīm',
-      arabic: 'حـم',
-    },
-    {
-      id: 27,
-      title: 'Qāla fa-mā khatbukum',
-      arabic: 'قال فما خطبكم',
-    },
-    {
-      id: 28,
-      title: 'Qad samiʿa -llāhu',
-      arabic: 'قد سمع اللہ',
-    },
-    {
-      id: 29,
-      title: 'Tabāraka -lladhi',
-      arabic: 'تبٰرک الذی',
-    },
-    {
-      id: 30,
-      title: 'ʿAmma',
-      arabic: '	عمّ',
-    },
-  ];
+
+  useEffect(() => {
+    getSurahs();
+  }, []);
 
   return (
     <div className='h-full bg-white dark:bg-slate-800 p-10'>
       <div className='flex items-center mb-5'>
-        <App />
+        <NavBar
+          options={options}
+          onSelect={onSelect}
+          handleSearch={handleSearch}
+        />
       </div>
       <div className='grid grid-cols-4 gap-5'>
-        {juz.map((res) => {
+        {Juz.map((res) => {
           return (
             <button
               key={res.id}

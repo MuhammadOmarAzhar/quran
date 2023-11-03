@@ -3,24 +3,17 @@ import {useRouter} from 'next/router';
 import axios from 'axios';
 import {useEffect, useState} from 'react';
 import Loader from '../components/loader';
-import App from '../components/navbar';
 
 const Surah = () => {
   const [ayah, setAyah] = useState([]);
   const [translation, setTranslation] = useState('');
   const [loader, setLoader] = useState(false);
   const router = useRouter();
-  const surahNumber = router.query.surahNumber;
-  const surahName = router.query.surahName;
+  const {surahNumber, surahName} = router.query;
 
-  useEffect(() => {
-    if (surahNumber) {
-      fetchSurah(surahNumber);
-    }
-  }, [surahNumber]);
-
-  const getSurahs = async (surahNumber) => {
+  const getSurahs = async () => {
     try {
+      setLoader(true);
       const [englishData, ArabicData] = await Promise.all([
         axios.get(`http://api.alquran.cloud/v1/surah/${surahNumber}/en.asad`),
         axios.get(
@@ -32,20 +25,15 @@ const Surah = () => {
       const translation = englishData.data.data.ayahs;
       setTranslation(translation);
       setAyah(ayahs);
-      setLoader(false);
     } catch (error) {
       console.log(error.message);
     }
+    setLoader(false);
   };
 
-  const fetchSurah = async (surahNumber) => {
-    try {
-      setLoader(true);
-      await getSurahs(surahNumber);
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
+  useEffect(() => {
+    getSurahs();
+  }, []);
 
   return (
     <>
@@ -54,9 +42,6 @@ const Surah = () => {
       ) : (
         <>
           <div className='bg-white dark:bg-slate-800 text-black p-10 grid grid-cols-1'>
-            <div className='flex items-center mb-5'>
-              <App />
-            </div>
             <div className='text-center font-uthmanic-hafs text-black dark:text-white text-4xl'>
               {surahName}
             </div>
