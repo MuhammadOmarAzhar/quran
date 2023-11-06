@@ -3,13 +3,22 @@ import {useRouter} from 'next/router';
 import axios from 'axios';
 import {useEffect, useState} from 'react';
 import Loader from '../components/loader';
+import {useStore} from '../store';
 
 const Surah = () => {
   const [ayah, setAyah] = useState([]);
   const [translation, setTranslation] = useState('');
   const [loader, setLoader] = useState(false);
   const router = useRouter();
-  const {surahNumber, surahName} = router.query;
+  const {surahNumber} = router.query;
+
+  const {
+    surahNameStore,
+    translationStore,
+    setTranslationStore,
+    ayahStore,
+    setAyahStore,
+  } = useStore((state) => state);
 
   const getSurahs = async () => {
     try {
@@ -23,8 +32,8 @@ const Surah = () => {
 
       const ayahs = ArabicData.data.data.ayahs;
       const translation = englishData.data.data.ayahs;
-      setTranslation(translation);
-      setAyah(ayahs);
+      setTranslationStore(translation);
+      setAyahStore(ayahs);
     } catch (error) {
       console.log(error.message);
     }
@@ -43,16 +52,16 @@ const Surah = () => {
         <>
           <div className='bg-white dark:bg-slate-800 text-black p-10 grid grid-cols-1'>
             <div className='text-center font-uthmanic-hafs text-black dark:text-white text-4xl'>
-              {surahName}
+              {surahNameStore}
             </div>
-            {ayah.map((res, index) => {
+            {ayahStore.map((res, index) => {
               return (
                 <div
                   key={res.number}
                   className='text-black dark:text-white p-4 m-3 border rounded-md'
                 >
                   <h1>
-                    {surahNumber}:{translation[index].numberInSurah}
+                    {surahNumber}:{translationStore[index].numberInSurah}
                   </h1>
                   <h1 className='font-bold text-2xl text-right font-uthmanic-hafs'>
                     {res.text}
@@ -60,7 +69,7 @@ const Surah = () => {
                   <h1 className='font-semibold'>
                     Translation: <br />
                   </h1>
-                  <p>{translation[index].text}</p>
+                  <p>{translationStore[index].text}</p>
                 </div>
               );
             })}

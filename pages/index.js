@@ -3,12 +3,15 @@ import NavBar from './components/navbar';
 import {Juz} from './constants';
 import {useEffect, useState} from 'react';
 import axios from 'axios';
-import {first} from 'lodash';
+import {first, isNil} from 'lodash';
+import {useStore} from './store';
 
 export default function Home() {
   const router = useRouter();
   const [options, setOptions] = useState([]);
   const [surahList, setSurahList] = useState([]);
+
+  const {surahNameStore, setSurahNameStore} = useStore((state) => state);
 
   const getSurahs = async () => {
     try {
@@ -38,6 +41,8 @@ export default function Home() {
 
   const onSelect = (value) => {
     const surah = first(options.filter((res) => res.value == value));
+    setSurahNameStore(surah.label);
+    localStorage.setItem('surahname', surah.label);
     router.push({
       pathname: '/surahs',
       query: {surahNumber: surah.number, surahName: surah.label},
@@ -51,7 +56,15 @@ export default function Home() {
     });
   };
 
+  const getLocalData = () => {
+    let value = localStorage.getItem('surahname');
+    if (!isNil(value)) {
+      setSurahNameStore(value);
+    }
+  };
+
   useEffect(() => {
+    getLocalData();
     getSurahs();
   }, []);
 
